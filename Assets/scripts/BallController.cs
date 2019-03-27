@@ -96,6 +96,7 @@ public class BallController : MonoBehaviour
             
             rigidBody.velocity = new Vector3 (0, 0, 0);
             rigidBody.angularVelocity = new Vector3(0, 0, 0);
+            ballTransform.localScale = new Vector3(minSize, minSize, minSize);
             rigidBody.position = spawnPos.position;
        
             
@@ -201,6 +202,11 @@ public class BallController : MonoBehaviour
 		{
 			rigidBody.AddForce( new Vector3( 1, 0, 0 ) * forceToApply, ForceMode.Acceleration );
 		}
-	}
+
+        if (rigidBody.velocity.magnitude > maxSpeed)
+        {
+            rigidBody.velocity = Vector3.ClampMagnitude(rigidBody.velocity, maxSpeed);
+        }
+    }
 
 }
