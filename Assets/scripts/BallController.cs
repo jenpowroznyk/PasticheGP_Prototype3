@@ -16,11 +16,18 @@ public class BallController : MonoBehaviour
 	public float minSize;
 	public float maxSize;
 	public float jumpForce;
+    private float go;
+    public AudioClip ding;
+    public AudioSource dingSound;
+
+    public static int score;
+
 	public Transform spawnPos;
 	public Vector3 spawnPosVector;
 
 	public Rigidbody rigidBody;
 	public Transform ballTransform;
+
 
 	private float timer = 0f;
 	private float initalLerpValue;
@@ -28,13 +35,16 @@ public class BallController : MonoBehaviour
 	private bool startShrinkLerp;
 	private bool applyOppisiteForce;
 	private bool canJump;
+    public static bool isDead;
 
 
 	// Start is called before the first frame update
 	void Start()
     {
-		
-	}
+        dingSound.clip = ding;
+        isDead = false;
+        go = 0;
+    }
 
 	private void BallGrow ()
 	{
@@ -84,7 +94,10 @@ public class BallController : MonoBehaviour
 		if(other.tag == "ShrinkItem")
 		{
 			BallShrinkInstant();
-			//Destroy(other.gameObject);
+            dingSound.Play();
+            score = score + 1;
+            Debug.Log(score);
+            Destroy(other.gameObject);
 		}
 		else if ( other.tag == "GrowItem" )
 		{
@@ -98,10 +111,18 @@ public class BallController : MonoBehaviour
             rigidBody.angularVelocity = new Vector3(0, 0, 0);
             ballTransform.localScale = new Vector3(minSize, minSize, minSize);
             rigidBody.position = spawnPos.position;
-       
+            PlayerDied();
             
         }
 	}
+
+    void PlayerDied()
+    {
+
+        isDead = true;
+        
+    }
+
 
 	//Jump 
 	private void OnCollisionEnter ( Collision collision )
@@ -128,6 +149,17 @@ public class BallController : MonoBehaviour
 	// Update is called once per frame
 	void Update()
     {
+
+        if (isDead == true)
+        {
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                isDead = false;
+                score = 0;
+                Application.LoadLevel("SampleScene");
+            }
+
+        }
 
 		if ( startGrowLerp )
 		{
@@ -158,7 +190,7 @@ public class BallController : MonoBehaviour
 			}
 		}
 
-        //Manet input
+        //Manet input option
 		float forward = Input.GetAxis( "Vertical" );
 		float right = Input.GetAxis( "Horizontal" );
 		Vector3 moveDirection = new Vector3( right, 0, forward );
@@ -184,12 +216,16 @@ public class BallController : MonoBehaviour
 			rigidBody.AddForce( new Vector3(0,1,0) * jumpForce, ForceMode.VelocityChange );
 		}
 
-		
-            rigidBody.AddForce(new Vector3(0, 0, 1) * forceToApply, ForceMode.Acceleration);
-            BallGrow();
-		
+        if (Input.GetKeyDown(KeyCode.W))
+        {
+             go = 1;
+        }
 
-		 if( Input.GetKey( KeyCode.S))
+    
+
+        rigidBody.AddForce(new Vector3(0, 0, go) * forceToApply, ForceMode.Acceleration);
+
+        if ( Input.GetKey( KeyCode.S))
 		{
 			rigidBody.AddForce( new Vector3( 0, 0, -1 ) * forceToApply, ForceMode.Acceleration );
 			BallGrow();
