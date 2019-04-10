@@ -8,6 +8,8 @@ TagManager:
   - GrowItem
   - Ground
   - YouDiedBox
+  - ShowOnEnd
+  - ShowInGame
   layers:
   - Default
   - TransparentFX
